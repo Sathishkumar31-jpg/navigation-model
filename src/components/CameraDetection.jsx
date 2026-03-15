@@ -15,6 +15,15 @@ const CameraDetection = ({ isActive, onStatusChange }) => {
   const animationRef = useRef(null);
   const streamRef = useRef(null);
   const lastAlertTime = useRef(0);
+   const targetClasses = [
+    'person', 'chair', ' table', 'couch', 'bed', 'tv', 'laptop',
+    'motorcycle', 'bicycle', 'car', 'bus', 'truck', 'bottle', 'cup',
+    'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich',
+    'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut',
+    'cake', 'potted plant', 'vase', 'scissors', 'teddy bear',
+    'hair drier', 'toothbrush', 'sink', 'toilet', 'book', 'clock',
+    'door', 'window', 'stairs'
+  ];
 
   const speak = (text) => {
     if ("speechSynthesis" in window) {
@@ -175,43 +184,43 @@ const CameraDetection = ({ isActive, onStatusChange }) => {
   };
   const processPredictions = (predictions) => {
 
-    const now = Date.now();
+  const now = Date.now();
 
-    if (now - lastAlertTime.current < 2000) return;
+  if (now - lastAlertTime.current < 2000) return;
 
-    const videoWidth = videoRef.current.videoWidth;
+  const videoWidth = videoRef.current.videoWidth;
 
-    let alerts = [];
+  let alerts = [];
 
-    predictions.forEach(p => {
+  predictions.forEach(p => {
 
-      if (p.score < 0.6) return;
+    if (p.score < 0.6) return;
 
-      const [x, y, width, height] = p.bbox;
+    const [x, y, width, height] = p.bbox;
 
-      const center = x + width / 2;
+    const center = x + width / 2;
 
-      let position = "center";
+    let position = "center";
 
-      if (center < videoWidth * 0.33) position = "left";
-      else if (center > videoWidth * 0.66) position = "right";
+    if (center < videoWidth * 0.33) position = "left";
+    else if (center > videoWidth * 0.66) position = "right";
 
-      alerts.push(`${p.class} ${position}`);
+    alerts.push(`${p.class} ${position}`);
 
-    });
+  });
 
-    if (alerts.length > 0) {
+  if (alerts.length > 0) {
 
-      lastAlertTime.current = now;
+    lastAlertTime.current = now;
 
-      const message = alerts.join(". ");
+    const message = alerts.join(". ");
 
-      speak(message);
-      onStatusChange?.(message);
+    speak(message);
+    onStatusChange?.(message);
 
-    }
+  }
 
-  };
+};
 
   const stopCamera = () => {
 
